@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'stack to create s3 resource'
+
+Parameters:
+  Prefix:
+    Type: String
+    Description: The unique prefix following the environment name that the pipleine is deployed to  
+
+  Environment:
+    Type: String
+    Description: The environment that the stack is deployed to
+    Default: sbx
+    AllowedValues:
+      - prd
+      - tst
+      - dev
+      - stg
+      - sbx
+      - int
+
+  Subnet1:
+    Type: String
+    Description: subnet1
+
+  Subnet2:
+    Type: String
+    Description: subnet2
+
+  TestVPC:
+    Type: String
+    Description: VPC ID
+
+Resources:
+  TestLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      IpAddressType: 'ipv4'
+      Name: !Sub "${Prefix}-${Environment}-TestALB"
+      Scheme: 'internet-facing'
+      Subnets: 
+        - !Ref Subnet1
+        - !Ref Subnet2
+      Type: 'application'
+  
+  TargetGroup1:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref TestVPC
+      TargetType: instance
+      Port: 80
+      Protocol: HTTP
+
+  TgListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup1
+      LoadBalancerArn: !Ref TestLoadBalancer
+      Port: '80'
+      Protocol: HTTP
+
+Outputs:
+  TestLoadBalancer:
+    Description: "ALB Name"
+    Value: !Ref TestLoadBalancer
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-ALB'
+  TargetGroupARN:
+    Description: "TG fro ALB"
+    Value: !Ref TargetGroup1
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-TG'

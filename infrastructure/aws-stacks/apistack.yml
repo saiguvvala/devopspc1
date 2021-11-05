@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'stack to create s3 resource'
+
+Parameters:
+  Prefix:
+    Type: String
+    Description: The unique prefix following the environment name that the pipleine is deployed to  
+
+  Environment:
+    Type: String
+    Description: The environment that the stack is deployed to
+    Default: sbx
+    AllowedValues:
+      - prd
+      - tst
+      - dev
+      - stg
+      - sbx
+      - int
+  
+  KeyName:
+    Type: String
+    Description: The environment that the stack is deployed to
+
+  TestLoadBalancer:
+    Type: String
+    Description: Load balancer ARN
+
+  TargetGroupARN:
+    Type: String
+    Description: Target Group ARN ALB
+
+  Subnet1:
+    Type: String
+    Description: subnet1
+
+  Subnet2:
+    Type: String
+    Description: subnet2
+  
+  DBSubnet:
+    Type: String
+    Description: DB subnet
+
+  MyDBSecurityGroup:
+    Type: String
+    Description: DB Sg
+
+Resources:
+  TestASGLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties: 
+      LaunchTemplateName: !Sub "${Prefix}-${Environment}-TestASGLaunchTemplate"
+      LaunchTemplateData: 
+        ImageId: 'ami-0194c3e07668a7e36'
+        InstanceInitiatedShutdownBehavior: 'stop'
+        InstanceType: 't2.micro'
+        KeyName: !Ref KeyName
+
+  TestAutoscalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties: 
+      AutoScalingGroupName: !Sub "${Prefix}-${Environment}-UsersAPIAutoscalingGroup"
+      Cooldown: '300'
+      DesiredCapacity: '1'
+      HealthCheckGracePeriod: 300
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref TestASGLaunchTemplate
+        Version: !GetAtt TestASGLaunchTemplate.LatestVersionNumber
+      MaxSize: '4'
+      MinSize: '1'
+      VPCZoneIdentifier:
+        - !Ref Subnet1
+        - !Ref Subnet2
+      TargetGroupARNs: 
+        - !Ref TargetGroupARN
+
+  DBInstance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: 'ami-0194c3e07668a7e36'
+      KeyName: !Ref KeyName
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet: 
+            - !Ref MyDBSecurityGroup
+          SubnetId: !Ref DBSubnet
+     

@@ -1,0 +1,160 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: 'stack to create s3 resource'
+
+Parameters:
+  Prefix:
+    Type: String
+    Description: The unique prefix following the environment name that the pipleine is deployed to  
+
+  Environment:
+    Type: String
+    Description: The environment that the stack is deployed to
+    Default: sbx
+    AllowedValues:
+      - prd
+      - tst
+      - dev
+      - stg
+      - sbx
+      - int
+  
+  KeyName:
+    Type: String
+    Description: The environment that the stack is deployed to
+
+Resources:
+  TestVPC:
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.0.0.0/20
+      EnableDnsHostnames: yes
+      EnableDnsSupport: yes
+
+  TestIGW:
+    Type: AWS::EC2::InternetGateway
+
+  TestIGWVPCAttachemnet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref TestIGW
+      VpcId: !Ref TestVPC
+  
+  TestRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref TestVPC
+  
+  InternetRoute: 
+    Type: AWS::EC2::Route
+    Properties: 
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref TestIGW
+      RouteTableId: !Ref TestRouteTable
+
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: 'eu-west-2b'
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref TestVPC
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: 'eu-west-2a'
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref TestVPC
+
+  DBSubnet:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: 'eu-west-2c'
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref TestVPC
+
+  SubnetIGWRouteAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref TestRouteTable
+      SubnetId: !Ref Subnet1
+
+  SubnetIGWRouteAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref TestRouteTable
+      SubnetId: !Ref Subnet2
+
+  APISecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: API Security Group
+      GroupName: API-Sg
+      SecurityGroupIngress: 
+        - CidrIp: '0.0.0.0/0'
+          Description: String
+          FromPort: 80
+          IpProtocol: 'tcp'
+          ToPort: 80
+      SecurityGroupEgress: 
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref TestVPC
+
+  MyDBSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        VpcId: !Ref TestVPC
+        GroupDescription: database Security Group
+
+  OutboundRuleAPItoDB:
+      Type: AWS::EC2::SecurityGroupEgress
+      Properties:
+        IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        DestinationSecurityGroupId: !GetAtt MyDBSecurityGroup.GroupId
+        GroupId: !GetAtt APISecurityGroup.GroupId
+         
+  InboundRuleDBFromAPI:
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        SourceSecurityGroupId: !GetAtt APISecurityGroup.GroupId
+        GroupId: !GetAtt MyDBSecurityGroup.GroupId
+         
+
+Outputs:
+  Subnet1:
+    Description: "Subnet1"
+    Value: !Ref Subnet1
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-Subnet1'
+  Subnet2:
+    Description: "Subnet2"
+    Value: !Ref Subnet2
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-Subnet2'
+  MyDBSecurityGroup:
+    Description: "MyDBSecurityGroup"
+    Value: !Ref MyDBSecurityGroup
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-MyDBSecurityGroup'
+  DBSubnet:
+    Description: "Subnet2"
+    Value: !Ref DBSubnet
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-DBSubnet'
+  TestVPC:
+    Description: "TestVPC"
+    Value: !Ref TestVPC
+    Export:
+      Name: !Sub '${Prefix}-${Environment}-TestVPC'    
+
