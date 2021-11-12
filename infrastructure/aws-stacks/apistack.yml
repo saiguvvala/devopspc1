@@ -76,15 +76,15 @@ Resources:
       TargetGroupARNs: 
         - !Ref TargetGroupARN
 
-  DBInstance:
-    Type: AWS::EC2::Instance
-    Properties: 
-      ImageId: 'ami-0194c3e07668a7e36'
-      KeyName: !Ref KeyName
-      NetworkInterfaces: 
-        - AssociatePublicIpAddress: "true"
-          DeviceIndex: "0"
-          GroupSet: 
-            - !Ref MyDBSecurityGroup
-          SubnetId: !Ref DBSubnet
+  # DBInstance:
+  #   Type: AWS::EC2::Instance
+  #   Properties: 
+  #     ImageId: 'ami-0194c3e07668a7e36'
+  #     KeyName: !Ref KeyName
+  #     NetworkInterfaces: 
+  #       - AssociatePublicIpAddress: "true"
+  #         DeviceIndex: "0"
+  #         GroupSet: 
+  #           - !Ref MyDBSecurityGroup
+  #         SubnetId: !Ref DBSubnet
      
