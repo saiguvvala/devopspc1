@@ -10,7 +10,6 @@ RUN tar xvf go1.14.3.linux-amd64.tar.gz
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH /go
 ENV GO111MODULE on
-ENV GOPRIVATE 'github.com/emisgroup'
 
 # https://issues.jenkins-ci.org/browse/JENKINS-51964
 ENV XDG_CACHE_HOME "/tmp/.cache"

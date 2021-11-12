@@ -1,57 +1,25 @@
 pipeline {
-   agent {
-      dockerfile {
-         filename 'Jenkins/Dockerfile-Build'
-         args '-u root'
-      }
-   }
-
+   agent any
    environment {
-      GITHUB_TOKEN          = credentials('Jenkins-User')
-      AWS_REGION            = "eu-west-2"
-      AWS_DEFAULT_REGION    = "eu-west-2"
-      PROJECT_NAME          = "ALB-DB"
+      Access_Key = credentials('Access_Key')
+      Secret_Key = credentials('Secret_Key')
    }
-      
    stages {
-      stage('Clean') {
-         steps {
-            sh '(cd ${WORKSPACE}/src; make clean;)'
+      stage("build"){
+         steps{
+            echo 'build'
          }
       }
 
-      stage('Install') {
-         steps {
-            sh 'git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"'
-         }
-      }
-      stage('Analyse') {
-         steps {
-            parallel(
-               "CFN Linting": {
-                  sh '(cd ${WORKSPACE}; make cfn-lint)'
-               },
-            )
-         }
-      }
-     
-      stage('Deploy') {
-         parallel {
-            stage('Development') {
-               when { branch 'master' }
-               steps {
-                  script {
-                     sh '(cd ${WORKSPACE}; ./Jenkins/deploy.sh )'
-                  }
-               }
+      stage("deploy"){
+         steps{
+            script {
+               sh '(chmod 777 ./Jenkins/cfn.json )'
+               sh '(sed -i -e "s|{Secret_Key}|${Secret_Key}|g; s|{Access_Key}|${Access_Key}|g" ./Jenkins/cfn.json)'
+               sh '(cat ./Jenkins/cfn.json )'
+               sh '(cd ${WORKSPACE};chmod 777 ./Jenkins/deploy.sh;  ./Jenkins/deploy.sh )'     
             }
          }
-      }
-   }
-   //Cleanup
-   post {
-      cleanup {
-         cleanWs()
       }
    }
 }
