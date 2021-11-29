@@ -53,7 +53,7 @@ Resources:
     Properties: 
       LaunchTemplateName: !Sub "${Prefix}-${Environment}-TestASGLaunchTemplate"
       LaunchTemplateData: 
-        ImageId: 'ami-0194c3e07668a7e36'
+        ImageId: 'ami-0567e0d2b4b2169ae'
         InstanceInitiatedShutdownBehavior: 'stop'
         InstanceType: 't2.micro'
         KeyName: !Ref KeyName

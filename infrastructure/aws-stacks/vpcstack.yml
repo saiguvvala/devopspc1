@@ -55,7 +55,7 @@ Resources:
   Subnet1:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: 'eu-west-2b'
+      AvailabilityZone: 'ap-south-1b'
       CidrBlock: 10.0.1.0/24
       MapPublicIpOnLaunch: true
       VpcId: !Ref TestVPC
@@ -63,7 +63,7 @@ Resources:
   Subnet2:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: 'eu-west-2a'
+      AvailabilityZone: 'ap-south-1a'
       CidrBlock: 10.0.0.0/24
       MapPublicIpOnLaunch: true
       VpcId: !Ref TestVPC
@@ -71,7 +71,7 @@ Resources:
   DBSubnet:
     Type: AWS::EC2::Subnet
     Properties: 
-      AvailabilityZone: 'eu-west-2c'
+      AvailabilityZone: 'ap-south-1c'
       CidrBlock: 10.0.2.0/24
       MapPublicIpOnLaunch: true
       VpcId: !Ref TestVPC
