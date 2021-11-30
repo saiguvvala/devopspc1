@@ -15,6 +15,7 @@ PROFILE=$(jq -r ".profile" < ./Jenkins/cfn.json)
 ACCESS_KEY=$(jq -r ".access_key" < ./Jenkins/cfn.json)
 SECRET_KEY=$(jq -r ".secret_key" < ./Jenkins/cfn.json)
 SNSBUCKETNAME=$(jq -r ".s3SnsBucketName" < ./Jenkins/cfn.json)
+KEYNAME=$(jq -r ".keyName" < ./Jenkins/cfn.json)
 
 
 

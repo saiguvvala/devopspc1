@@ -6,5 +6,6 @@
     "profile": "default",
     "secret_key": "{Secret_Key}",
     "access_key": "{Access_Key}",
-    "s3SnsBucketName": "saii-sbx-snstest"
+    "s3SnsBucketName": "saii-sbx-snstest",
+    "keyName": "sai_kp"
 }
