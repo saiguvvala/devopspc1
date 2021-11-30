@@ -27,7 +27,7 @@ Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: 'https://saii-sbx-snstest.s3.ap-south-1.amazonaws.com/vpcstack_release.yaml'
+      TemplateURL: './vpcstack_release.yaml'
       Parameters:
         Prefix: !Ref Prefix
         Environment: !Ref Environment
@@ -37,7 +37,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: VPCStack
     Properties:
-      TemplateURL: 'https://saii-sbx-snstest.s3.ap-south-1.amazonaws.com/loadbalancer_release.yaml'
+      TemplateURL: './loadbalancer_release.yaml'
       Parameters:
         Prefix: !Ref Prefix
         Environment: !Ref Environment
@@ -49,7 +49,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: ALBStack
     Properties:
-      TemplateURL: 'https://saii-sbx-snstest.s3.ap-south-1.amazonaws.com/apistack_release.yaml'
+      TemplateURL: './apistack_release.yaml'
       Parameters:
         Prefix: !Ref Prefix
         Environment: !Ref Environment
