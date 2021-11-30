@@ -38,7 +38,12 @@ export AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}"
 ##
 # Package infrastructure
 ##
+ls -la
+
+ 
 cd "${GITHUB_WORKSPACE}"/infrastructure
+
+ls -la
 
 aws cloudformation package \
     --template-file aws-stacks/s3updates-stack.yml \
