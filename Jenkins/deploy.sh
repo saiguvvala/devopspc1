@@ -8,7 +8,6 @@
 apt-get install jq
 cat ./Jenkins/cfn.json
 
-ROLE_ARN=$(jq -r ".targetAccountRoleArn" < ./Jenkins/cfn.json)
 ARTIFACT_NAME=$(jq -r ".artifactsBucket" < ./Jenkins/cfn.json)
 PREFIX=$(jq -r ".prefix" < ./Jenkins/cfn.json)
 TARGET_ENVIRONMENT=$(jq -r ".environment" < ./Jenkins/cfn.json)

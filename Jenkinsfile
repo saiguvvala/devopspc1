@@ -1,8 +1,8 @@
 pipeline {
    agent any
    environment {
-      Access_Key = credentials('Access_Key')
-      Secret_Key = credentials('Secret_Key')
+      Access_Key = credentials('ACCESS_KEY')
+      Secret_Key = credentials('SECRET_KEY')
    }
    stages {
       stage("build"){
